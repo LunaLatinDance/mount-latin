@@ -1,7 +1,60 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
+
+// Tipos para la API global de Turnstile
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        element: HTMLElement,
+        options: {
+          sitekey: string
+          callback: (token: string) => void
+          'error-callback'?: () => void
+          'expired-callback'?: () => void
+          theme?: 'light' | 'dark' | 'auto'
+        }
+      ) => string
+      reset: (widgetId?: string) => void
+      remove: (widgetId?: string) => void
+    }
+    onTurnstileLoad?: () => void
+  }
+}
+
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY
 
 export default function Contact() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [turnstileToken, setTurnstileToken] = useState<string>('')
+  const turnstileRef = useRef<HTMLDivElement>(null)
+  const widgetIdRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    // Callback global que Turnstile llama cuando el script está listo
+    window.onTurnstileLoad = () => {
+      if (turnstileRef.current && !widgetIdRef.current && window.turnstile) {
+        widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
+          sitekey: TURNSTILE_SITE_KEY,
+          callback: (token) => setTurnstileToken(token),
+          'expired-callback': () => setTurnstileToken(''),
+          'error-callback': () => setTurnstileToken(''),
+          theme: 'dark',
+        })
+      }
+    }
+
+    // Si el script ya cargó antes de montar el componente
+    if (window.turnstile && turnstileRef.current && !widgetIdRef.current) {
+      window.onTurnstileLoad()
+    }
+
+    return () => {
+      if (widgetIdRef.current && window.turnstile) {
+        window.turnstile.remove(widgetIdRef.current)
+        widgetIdRef.current = null
+      }
+    }
+  }, [])
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -9,6 +62,19 @@ export default function Contact() {
 
     const form = e.currentTarget
     const formData = new FormData(form)
+
+    // Honeypot: si tiene valor, es un bot
+    const honeypot = formData.get('company') as string
+    if (honeypot) {
+      // Fingimos que se envió para no darle pistas al bot
+      setStatus('sent')
+      return
+    }
+
+    if (!turnstileToken) {
+      setStatus('error')
+      return
+    }
 
     try {
       const res = await fetch('/api/contact', {
@@ -19,14 +85,24 @@ export default function Contact() {
           email: formData.get('email'),
           phone: formData.get('phone'),
           message: formData.get('message'),
+          turnstileToken,
         }),
       })
 
       if (res.ok) {
         setStatus('sent')
         form.reset()
+        // Resetear el widget para el próximo envío
+        if (widgetIdRef.current && window.turnstile) {
+          window.turnstile.reset(widgetIdRef.current)
+          setTurnstileToken('')
+        }
       } else {
         setStatus('error')
+        if (widgetIdRef.current && window.turnstile) {
+          window.turnstile.reset(widgetIdRef.current)
+          setTurnstileToken('')
+        }
       }
     } catch {
       const name = formData.get('name')
@@ -58,7 +134,7 @@ export default function Contact() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <form
             onSubmit={handleSubmit}
             className="bg-dark/50 backdrop-blur border border-white/5 rounded-3xl p-8 md:p-10 reveal-left"
@@ -119,9 +195,26 @@ export default function Contact() {
                 />
               </div>
 
+              {/* Honeypot: oculto a usuarios reales, los bots lo llenan */}
+              <div className="absolute opacity-0 pointer-events-none -left-[9999px]" aria-hidden="true">
+                <label htmlFor="company">Company</label>
+                <input
+                  type="text"
+                  id="company"
+                  name="company"
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </div>
+
+              {/* Turnstile widget */}
+              <div className="flex justify-center">
+                <div ref={turnstileRef} />
+              </div>
+
               <button
                 type="submit"
-                disabled={status === 'sending'}
+                disabled={status === 'sending' || !turnstileToken}
                 className="w-full bg-gradient-to-r from-turquesa to-mostaza text-dark py-4 rounded-xl font-semibold text-lg transition-all hover:animate-pulse disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {status === 'sending' ? (
@@ -139,7 +232,7 @@ export default function Contact() {
 
               {status === 'sent' && (
                 <p className="text-green-400 text-center text-sm font-medium">
-                  Message sent! We'll get back to you soon 🎉
+                  Message sent! We'll get back to you soon.
                 </p>
               )}
               {status === 'error' && (
@@ -150,10 +243,10 @@ export default function Contact() {
             </div>
           </form>
 
-          <div className="space-y-8 reveal-right">
-            <div className="bg-dark/50 backdrop-blur border border-white/5 rounded-3xl p-8">
+          <div className="space-y-8 reveal-right flex flex-col h-full">
+            <div className="bg-dark/50 backdrop-blur border border-white/5 rounded-3xl p-8 flex-1 flex flex-col">
               <h3 className="font-display text-2xl font-bold text-white mb-6">Contact info</h3>
-              <div className="space-y-5">
+              <div className="space-y-5 flex-1 flex flex-col justify-around">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-turquesa/20 flex items-center justify-center flex-shrink-0">
                     <svg className="w-5 h-5 text-turquesa" fill="none" viewBox="0 0 24 24" stroke="currentColor">
