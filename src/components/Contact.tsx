@@ -12,6 +12,7 @@ declare global {
           'error-callback'?: () => void
           'expired-callback'?: () => void
           theme?: 'light' | 'dark' | 'auto'
+          appearance?: 'always' | 'execute' | 'interaction-only'
         }
       ) => string
       reset: (widgetId?: string) => void
@@ -39,6 +40,7 @@ export default function Contact() {
           'expired-callback': () => setTurnstileToken(''),
           'error-callback': () => setTurnstileToken(''),
           theme: 'dark',
+          appearance: 'interaction-only',
         })
       }
     }
