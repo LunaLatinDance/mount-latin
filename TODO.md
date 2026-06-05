@@ -30,3 +30,15 @@
 - [ ] Base de datos (Supabase) para guardar reservas y alumnos
 - [ ] Auth para admin/alumnos
 - [ ] Tests con Playwright
+
+## 📋 Workarounds / Notas
+
+- [ ] **Deploy manual con Vercel CLI** — alternativa al `git push` cuando Vercel Hobby bloquea deploys de repos privados por restricción de colaboradores (1 solo user por proyecto). Útil si en el futuro el repo vuelve a privado:
+  ```bash
+  npm i -g vercel
+  vercel login
+  vercel --prod
+  ```
+  Para automatizar: GitHub Actions con un Vercel token (bypasea el check de colaboradores y mantiene el flujo `git push` → deploy).
+
+- [ ] **Vercel Hobby + repo privado + push desde otra cuenta/org de GitHub** — Vercel bloquea el deploy diciendo "commit author did not have contributing access". Causa: el plan Hobby solo soporta 1 usuario por proyecto privado. Solución actual: repo público. Si querés mantenerlo privado, ir a la opción de Vercel CLI de arriba.
