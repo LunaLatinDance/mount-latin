@@ -7,7 +7,7 @@ const LOCATIONS = [
     address: '12 Zambuk Way, Mount Maunganui',
     query: 'Arataki Community Centre Mount Maunganui',
     schedule: {
-      level: 'Beginner Salsa & Bachata',
+      level: 'Improvers',
       day: 'Wednesday',
       time: 'Salsa 7:30pm · Bachata 8:30pm',
     },
@@ -18,9 +18,9 @@ const LOCATIONS = [
     address: '345 Maunganui Road, Mount Maunganui',
     query: 'Mount Community Hall Mount Maunganui',
     schedule: {
-      level: 'Intermediate Salsa & Bachata',
+      level: 'Beginner · Interm-Advanced',
       day: 'Tuesday',
-      time: 'Salsa 7:30pm · Bachata 8:30pm',
+      time: '6:30pm Salsa Beg · 7:30pm Salsa · 8:30pm Bachata',
     },
   },
 ]

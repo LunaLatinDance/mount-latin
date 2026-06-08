@@ -284,9 +284,9 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Schedule</p>
-                    <p className="text-white font-medium">Tue: Intermediate Salsa 7:30 · Bachata 8:30</p>
-                    <p className="text-white font-medium">Wed: Beginner Salsa 7:30 · Bachata 8:30</p>
-                    <p className="text-white font-medium">Thu: Advanced (limited spots)</p>
+                    <p className="text-white font-medium">Tue: 6:30pm Salsa Beg · 7:30pm Salsa · 8:30pm Bachata</p>
+                    <p className="text-white font-medium">Wed: 7:30pm Salsa · 8:30pm Bachata (Improvers)</p>
+                    <p className="text-white font-medium">Private: By arrangement</p>
                   </div>
                 </div>
               </div>

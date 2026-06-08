@@ -1,11 +1,11 @@
 export default function Gallery() {
   const captions = [
-    'New beginner courses 🥳',
+    'June schedule - New classes! 📅',
     'Course wrap-up — Welcome to the family 💃✨',
-    'First dance — Chris & Sarah 💍',
+    'Our amazing team 💃',
     'Social dance with stunning views 🌅',
     'Why dance Salsa & Bachata 💕',
-    'May is for DANCING ⭐️',
+    'Dancing together ✨',
   ]
 
   return (

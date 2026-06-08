@@ -1,33 +1,28 @@
 export default function Classes() {
   const classes = [
     {
-      id: 'beginner',
-      level: 'Beginner',
-      title: 'Salsa & Bachata',
-      desc: 'Your starting point. Learn the basic steps, rhythm, and connection. No experience needed.',
-      schedule: 'Wednesday',
-      time: 'Salsa 7:30pm · Bachata 8:30pm',
-      location: 'Arataki Community Center',
-      popular: false,
-    },
-    {
-      id: 'intermediate',
-      level: 'Intermediate',
-      title: 'Salsa & Bachata',
-      desc: 'Take your dancing to the next level. More complex patterns, technique, and musicality.',
-      schedule: 'Tuesday',
-      time: 'Salsa 7:30pm · Bachata 8:30pm',
+      id: 'tuesday',
+      level: 'Tuesday',
+      title: 'Mount Community Hall',
+      desc: 'Three levels to find your rhythm. From absolute beginner to inter-advanced.',
+      schedule: [
+        { time: '6:30pm', style: 'Salsa', level: 'Beginner', tag: 'NEW!' },
+        { time: '7:30pm', style: 'Salsa', level: 'Interm-Advanced' },
+        { time: '8:30pm', style: 'Bachata', level: 'Interm-Advanced' },
+      ],
       location: 'Mount Community Hall',
       popular: true,
     },
     {
-      id: 'advanced',
-      level: 'Advanced',
-      title: 'Advanced Level',
-      desc: 'Perfect your technique, shines, styling, and musicality. Limited spots — check availability.',
-      schedule: 'Thursday',
-      time: 'By arrangement',
-      location: 'Mount Maunganui',
+      id: 'wednesday',
+      level: 'Wednesday',
+      title: 'Arataki Community Center',
+      desc: 'Improvers level — take your dancing to the next step with more complex patterns.',
+      schedule: [
+        { time: '7:30pm', style: 'Salsa', level: 'Improvers' },
+        { time: '8:30pm', style: 'Bachata', level: 'Improvers' },
+      ],
+      location: 'Arataki Community Center',
       popular: false,
     },
     {
@@ -35,8 +30,7 @@ export default function Classes() {
       level: 'Private',
       title: 'First Dance / Wedding',
       desc: 'Personalized choreography for your first dance together. Create a magical, unforgettable moment.',
-      schedule: 'By arrangement',
-      time: 'Custom session',
+      schedule: [{ time: 'By arrangement', style: 'Custom', level: 'session' }],
       location: 'Mount Maunganui',
       popular: false,
     },
@@ -58,7 +52,7 @@ export default function Classes() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 stagger">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger">
           {classes.map((c) => (
             <div
               key={c.id}
@@ -77,9 +71,25 @@ export default function Classes() {
               <h3 className="font-display text-2xl font-bold text-white mt-2 mb-3">{c.title}</h3>
               <p className="text-white/60 text-sm leading-relaxed mb-6">{c.desc}</p>
               <div className="space-y-2 text-white/50 text-xs mb-6">
-                <span className="block">📅 {c.schedule}</span>
-                <span className="block">⏱ {c.time}</span>
-                <span className="block">📍 {c.location}</span>
+                {c.schedule.map((s, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    {s.time === 'By arrangement' ? (
+                      <span className="text-mostaza font-semibold">{s.time}</span>
+                    ) : (
+                      <>
+                        <span className="text-mostaza font-semibold w-16">{s.time}</span>
+                        <span className="text-white">{s.style}</span>
+                        <span className="text-white/60">{s.level}</span>
+                        {s.tag && (
+                          <span className="bg-turquesa text-dark text-[10px] font-bold px-2 py-0.5 rounded-full">
+                            {s.tag}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </div>
+                ))}
+                <span className="block mt-2">📍 {c.location}</span>
               </div>
               <a
                 href="#contact"
