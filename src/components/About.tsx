@@ -1,6 +1,6 @@
 export default function About() {
   const features = [
-    { title: 'Salsa LA', desc: 'From the basics to advanced levels. LA On1 style with technique and musicality.' },
+    { title: 'LA Salsa ', desc: 'From the basics to advanced levels. LA On1 style with technique and musicality.' },
     { title: 'Bachata', desc: 'Classic and sensual. Body movement, connection, and plenty of feeling in every class.' },
     { title: 'Socials', desc: 'Community dance nights with stunning views in Mount Maunganui.' },
     { title: 'First Dance', desc: 'Personalized choreography for your wedding. Create a magical, unforgettable moment.' },
