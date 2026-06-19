@@ -1,18 +1,33 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 
 const VIDEOS = [
-  { src: '/assets/hero-salsa.mp4', label: 'Salsa class' },
-  { src: '/assets/hero-salsa-2.mp4', label: 'Dancing together' },
+  { src: '/assets/hero-salsa.webm', poster: '/assets/hero-salsa.webp', label: 'Salsa class' },
+  { src: '/assets/hero-salsa-2.webm', poster: '/assets/hero-salsa-2.webp', label: 'Dancing together' },
 ]
 
 const INTERVAL = 6000
+// If onLoadedData doesn't fire within this time, show content anyway
+const LOAD_TIMEOUT_MS = 4000
 
 export default function HeroScrollVideo() {
   const [active, setActive] = useState(0)
   const [wiping, setWiping] = useState(false)
   const [loaded, setLoaded] = useState<Record<number, boolean>>({})
+  const [contentVisible, setContentVisible] = useState(false)
   const intervalRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
+  const loadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Fallback: show content even if video never loads
+  useEffect(() => {
+    loadTimeoutRef.current = setTimeout(() => {
+      setContentVisible(true)
+    }, LOAD_TIMEOUT_MS)
+
+    return () => {
+      if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current)
+    }
+  }, [])
 
   const advance = useCallback(() => {
     setWiping(true)
@@ -30,13 +45,22 @@ export default function HeroScrollVideo() {
   }, [advance])
 
   // Play/pause videos based on active index
+  // Only reset currentTime on first play to avoid re-fetch on mobile
+  const hasPlayedRef = useRef<Record<number, boolean>>({})
+
   useEffect(() => {
     VIDEOS.forEach((_, i) => {
       const video = videoRefs.current[i]
       if (!video) return
       if (i === active) {
-        video.currentTime = 0
-        video.play().catch(() => {})
+        if (!hasPlayedRef.current[i]) {
+          // First time: reset to start
+          video.currentTime = 0
+          hasPlayedRef.current[i] = true
+        }
+        video.play().catch(() => {
+          // Autoplay blocked — content is still shown via contentVisible
+        })
       } else {
         video.pause()
       }
@@ -45,7 +69,14 @@ export default function HeroScrollVideo() {
 
   const handleLoaded = (index: number) => {
     setLoaded((prev) => ({ ...prev, [index]: true }))
-    // Auto-play first video when loaded
+    setContentVisible(true)
+
+    // Clear the fallback timeout since at least one video loaded
+    if (loadTimeoutRef.current) {
+      clearTimeout(loadTimeoutRef.current)
+      loadTimeoutRef.current = null
+    }
+
     if (index === 0) {
       videoRefs.current[0]?.play().catch(() => {})
     }
@@ -71,13 +102,18 @@ export default function HeroScrollVideo() {
           <video
             ref={(el) => { videoRefs.current[i] = el }}
             className="absolute inset-0 w-full h-full object-cover"
-            src={video.src}
+            poster={video.poster}
             muted
             loop
             playsInline
-            preload="auto"
+            // Only preload the first video eagerly; the second loads lazily
+            // This halves the initial bandwidth demand on mobile
+            preload={i === 0 ? 'auto' : 'none'}
             onLoadedData={() => handleLoaded(i)}
-          />
+          >
+            <source src={video.src} type="video/webm" />
+            <source src={video.src.replace('.webm', '.mp4')} type="video/mp4" />
+          </video>
         </div>
       ))}
 
@@ -86,7 +122,7 @@ export default function HeroScrollVideo() {
 
       <div
         className={`absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center transition-all duration-700 ${
-          Object.keys(loaded).length > 0 ? 'opacity-100' : 'opacity-0'
+          contentVisible ? 'opacity-100' : 'opacity-0'
         }`}
       >
         <p className="font-script text-mostaza text-2xl md:text-3xl mb-4">
@@ -125,6 +161,12 @@ export default function HeroScrollVideo() {
               if (intervalRef.current) clearInterval(intervalRef.current)
               setActive(i)
               setWiping(false)
+              // Lazy-load the second video on demand when user clicks
+              const video = videoRefs.current[i]
+              if (video && video.preload === 'none') {
+                video.preload = 'auto'
+                video.load()
+              }
               intervalRef.current = setInterval(advance, INTERVAL)
             }}
             className={`h-1 rounded-full transition-all duration-500 ${
