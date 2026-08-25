@@ -1,12 +1,49 @@
+import { useEffect, useRef, useState } from 'react'
+
+const captions = [
+  'June schedule - New classes! 📅',
+  'Course wrap-up — Welcome to the family 💃✨',
+  'Our amazing team 💃',
+  'Social dance with stunning views 🌅',
+  'Why dance Salsa & Bachata 💕',
+  'Dancing together ✨',
+]
+
 export default function Gallery() {
-  const captions = [
-    'June schedule - New classes! 📅',
-    'Course wrap-up — Welcome to the family 💃✨',
-    'Our amazing team 💃',
-    'Social dance with stunning views 🌅',
-    'Why dance Salsa & Bachata 💕',
-    'Dancing together ✨',
-  ]
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const isOpen = activeIndex !== null
+
+  const close = () => setActiveIndex(null)
+  const showPrev = () =>
+    setActiveIndex((i) => (i === null ? i : (i - 1 + captions.length) % captions.length))
+  const showNext = () => setActiveIndex((i) => (i === null ? i : (i + 1) % captions.length))
+
+  // Lock body scroll and move focus to the close button while the lightbox is open
+  useEffect(() => {
+    if (!isOpen) return
+
+    document.body.style.overflow = 'hidden'
+    closeButtonRef.current?.focus()
+
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
+
+  // Keyboard navigation: ESC closes, arrows navigate
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close()
+      else if (e.key === 'ArrowLeft') showPrev()
+      else if (e.key === 'ArrowRight') showNext()
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen])
 
   return (
     <section id="gallery" className="py-24 md:py-32 bg-dark relative overflow-hidden">
@@ -35,6 +72,16 @@ export default function Gallery() {
           {captions.map((caption, i) => (
             <div
               key={i}
+              role="button"
+              tabIndex={0}
+              aria-label={`Open image: ${caption}`}
+              onClick={() => setActiveIndex(i)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  setActiveIndex(i)
+                }
+              }}
               className="group relative aspect-square rounded-2xl overflow-hidden bg-dark-light transition-transform duration-500 cursor-pointer hover:animate-pulse"
             >
               <img
@@ -50,6 +97,62 @@ export default function Gallery() {
           ))}
         </div>
       </div>
+
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4"
+          onClick={close}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Gallery image viewer"
+        >
+          <button
+            ref={closeButtonRef}
+            onClick={close}
+            aria-label="Close"
+            className="absolute top-4 right-4 z-10 rounded-full bg-white/10 hover:bg-white/20 p-3 text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-turquesa"
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              showPrev()
+            }}
+            aria-label="Previous image"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 rounded-full bg-white/10 hover:bg-white/20 p-3 text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-turquesa"
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          <div className="flex flex-col items-center gap-4" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={`/assets/instagram/post-${activeIndex + 1}.jpg`}
+              alt={captions[activeIndex]}
+              className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl"
+            />
+            <p className="text-white/80 text-sm font-medium text-center">{captions[activeIndex]}</p>
+          </div>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              showNext()
+            }}
+            aria-label="Next image"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 rounded-full bg-white/10 hover:bg-white/20 p-3 text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-turquesa"
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      )}
     </section>
   )
 }

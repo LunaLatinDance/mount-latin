@@ -12,7 +12,7 @@ const LOAD_TIMEOUT_MS = 4000
 export default function HeroScrollVideo() {
   const [active, setActive] = useState(0)
   const [wiping, setWiping] = useState(false)
-  const [loaded, setLoaded] = useState<Record<number, boolean>>({})
+  const [, setLoaded] = useState<Record<number, boolean>>({})
   const [contentVisible, setContentVisible] = useState(false)
   const intervalRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([])

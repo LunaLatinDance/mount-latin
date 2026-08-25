@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import Navbar from './components/Navbar'
 import HeroScrollVideo from './components/HeroScrollVideo'
+import Workshop from './components/Workshop'
 import About from './components/About'
 import Classes from './components/Classes'
 import Gallery from './components/Gallery'
@@ -36,6 +37,7 @@ export default function App() {
     <main className="min-h-screen">
       <Navbar />
       <HeroScrollVideo />
+      <Workshop />
       <About />
       <Classes />
       <Gallery />
