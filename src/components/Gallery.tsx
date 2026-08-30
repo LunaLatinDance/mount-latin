@@ -1,12 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 
-const captions = [
-  'June schedule - New classes! 📅',
-  'Course wrap-up — Welcome to the family 💃✨',
-  'Our amazing team 💃',
-  'Social dance with stunning views 🌅',
-  'Why dance Salsa & Bachata 💕',
-  'Dancing together ✨',
+const photos = [
+  { src: '/assets/instagram/post-3.jpg', caption: 'Our amazing team 💃' },
+  { src: '/assets/instagram/post-5.jpg', caption: 'Why dance Salsa & Bachata 💕' },
+  { src: '/assets/instagram/post-6.jpg', caption: 'Dancing together ✨' },
 ]
 
 export default function Gallery() {
@@ -16,8 +13,8 @@ export default function Gallery() {
 
   const close = () => setActiveIndex(null)
   const showPrev = () =>
-    setActiveIndex((i) => (i === null ? i : (i - 1 + captions.length) % captions.length))
-  const showNext = () => setActiveIndex((i) => (i === null ? i : (i + 1) % captions.length))
+    setActiveIndex((i) => (i === null ? i : (i - 1 + photos.length) % photos.length))
+  const showNext = () => setActiveIndex((i) => (i === null ? i : (i + 1) % photos.length))
 
   // Lock body scroll and move focus to the close button while the lightbox is open
   useEffect(() => {
@@ -68,13 +65,13 @@ export default function Gallery() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 stagger">
-          {captions.map((caption, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 stagger">
+          {photos.map((photo, i) => (
             <div
-              key={i}
+              key={photo.caption}
               role="button"
               tabIndex={0}
-              aria-label={`Open image: ${caption}`}
+              aria-label={`Open image: ${photo.caption}`}
               onClick={() => setActiveIndex(i)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -85,13 +82,13 @@ export default function Gallery() {
               className="group relative aspect-square rounded-2xl overflow-hidden bg-dark-light transition-transform duration-500 cursor-pointer hover:animate-pulse"
             >
               <img
-                src={`/assets/instagram/post-${i + 1}.jpg`}
-                alt={caption}
+                src={photo.src}
+                alt={photo.caption}
                 className="w-full h-full object-cover group-hover:opacity-80 transition-opacity"
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
-                <p className="text-white text-sm font-medium">{caption}</p>
+                <p className="text-white text-sm font-medium">{photo.caption}</p>
               </div>
             </div>
           ))}
@@ -132,11 +129,11 @@ export default function Gallery() {
 
           <div className="flex flex-col items-center gap-4" onClick={(e) => e.stopPropagation()}>
             <img
-              src={`/assets/instagram/post-${activeIndex + 1}.jpg`}
-              alt={captions[activeIndex]}
+              src={photos[activeIndex].src}
+              alt={photos[activeIndex].caption}
               className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl"
             />
-            <p className="text-white/80 text-sm font-medium text-center">{captions[activeIndex]}</p>
+            <p className="text-white/80 text-sm font-medium text-center">{photos[activeIndex].caption}</p>
           </div>
 
           <button

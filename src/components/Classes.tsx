@@ -1,29 +1,57 @@
 export default function Classes() {
-  const classes = [
+  type ScheduleItem = {
+    time: string
+    style: string
+    level: string
+    tag?: string
+  }
+
+  type ClassCard = {
+    id: string
+    month?: string
+    level: string
+    title: string
+    desc: string
+    schedule: ScheduleItem[]
+    location: string
+    popular: boolean
+    price: { qty: string; detail: string; amount: string }[]
+    priceNote: string
+  }
+
+  const classes: ClassCard[] = [
     {
       id: 'tuesday',
       level: 'Tuesday',
       title: 'Mount Community Hall',
-      desc: 'Three levels to find your rhythm. From absolute beginner to inter-advanced.',
+      desc: 'Three levels to find your rhythm. From improvers to intermediate.',
       schedule: [
-        { time: '6:30pm', style: 'Salsa', level: 'Beginner', tag: 'NEW!' },
-        { time: '7:30pm', style: 'Salsa', level: 'Interm-Advanced' },
-        { time: '8:30pm', style: 'Bachata', level: 'Interm-Advanced' },
+        { time: '6:30pm', style: 'Bachata', level: 'Improvers' },
+        { time: '7:30pm', style: 'Salsa', level: 'Intermediate' },
+        { time: '8:30pm', style: 'Bachata', level: 'Intermediate' },
       ],
       location: 'Mount Community Hall',
       popular: true,
+      price: [],
+      priceNote: '',
     },
     {
       id: 'wednesday',
+      month: 'September',
       level: 'Wednesday',
       title: 'Arataki Community Center',
-      desc: 'Improvers level — take your dancing to the next step with more complex patterns.',
+      desc: 'The brand new absolute beginner course — start fresh, no experience or partner needed.',
       schedule: [
-        { time: '7:30pm', style: 'Salsa', level: 'Improvers' },
-        { time: '8:30pm', style: 'Bachata', level: 'Improvers' },
+        { time: '7:30pm', style: 'Salsa', level: 'Beginners', tag: 'NEW!' },
+        { time: '8:30pm', style: 'Bachata', level: 'Beginners' },
       ],
       location: 'Arataki Community Center',
       popular: false,
+      price: [
+        { qty: '1 course', detail: 'Salsa OR Bachata · 4 weeks', amount: '$70' },
+        { qty: '2 courses', detail: 'Salsa AND Bachata · 4 weeks', amount: '$110' },
+      ],
+      priceNote: 'You save $30 when you do both courses.',
     },
     {
       id: 'firstdance',
@@ -33,6 +61,8 @@ export default function Classes() {
       schedule: [{ time: 'By arrangement', style: 'Custom', level: 'session' }],
       location: 'Mount Maunganui',
       popular: false,
+      price: [],
+      priceNote: '',
     },
   ]
 
@@ -67,6 +97,9 @@ export default function Classes() {
                   Most popular
                 </div>
               )}
+              {c.month && (
+                <p className="font-display text-lg font-bold text-white/90 mb-1">{c.month}</p>
+              )}
               <span className="text-mostaza text-xs font-semibold uppercase tracking-wider">{c.level}</span>
               <h3 className="font-display text-2xl font-bold text-white mt-2 mb-3">{c.title}</h3>
               <p className="text-white/60 text-sm leading-relaxed mb-6">{c.desc}</p>
@@ -91,6 +124,24 @@ export default function Classes() {
                 ))}
                 <span className="block mt-2">📍 {c.location}</span>
               </div>
+              {c.price.length > 0 && (
+                <div className="mb-6 rounded-xl border border-mostaza/20 bg-mostaza/5 p-4">
+                  {c.price.map((p) => (
+                    <div key={p.qty} className="flex items-center justify-between gap-3 py-1 first:pt-0 last:pb-0">
+                      <div>
+                        <p className="text-white/60 text-xs uppercase tracking-wider">{p.qty}</p>
+                        <p className="text-white/50 text-[11px]">{p.detail}</p>
+                      </div>
+                      <span className="font-display text-2xl font-bold gradient-text">{p.amount}</span>
+                    </div>
+                  ))}
+                  {c.priceNote && (
+                    <p className="text-mostaza text-xs font-semibold mt-2 border-t border-mostaza/20 pt-2">
+                      {c.priceNote}
+                    </p>
+                  )}
+                </div>
+              )}
               <a
                 href="#contact"
                 className={`block text-center py-3 rounded-full font-semibold text-sm transition-all ${
