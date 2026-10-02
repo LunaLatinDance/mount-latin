@@ -12,7 +12,6 @@ export default function Navbar() {
 
   const links = [
     { label: 'Home', href: '#home' },
-    { label: 'Workshop', href: '#workshop' },
     { label: 'Classes', href: '#classes' },
     { label: 'Gallery', href: '#gallery' },
     { label: 'Location', href: '#location' },
