@@ -8,7 +8,6 @@ export default function Classes() {
 
   type ClassCard = {
     id: string
-    month?: string
     level: string
     title: string
     desc: string
@@ -18,6 +17,9 @@ export default function Classes() {
     price: { qty: string; detail: string; amount: string }[]
     priceNote: string
   }
+
+  // Auto-updates every month with no code changes needed
+  const currentMonth = new Date().toLocaleString('en-NZ', { month: 'long' })
 
   const classes: ClassCard[] = [
     {
@@ -37,21 +39,30 @@ export default function Classes() {
     },
     {
       id: 'wednesday',
-      month: 'September',
       level: 'Wednesday',
       title: 'Arataki Community Center',
-      desc: 'The brand new absolute beginner course — start fresh, no experience or partner needed.',
+      desc: 'The next step — Beginner II courses to keep building your Salsa & Bachata foundation.',
       schedule: [
-        { time: '7:30pm', style: 'Salsa', level: 'Beginners', tag: 'NEW!' },
-        { time: '8:30pm', style: 'Bachata', level: 'Beginners' },
+        { time: '7:30pm', style: 'Salsa', level: 'Beginner II' },
+        { time: '8:30pm', style: 'Bachata', level: 'Beginner II' },
       ],
       location: 'Arataki Community Center',
       popular: false,
-      price: [
-        { qty: '1 course', detail: 'Salsa OR Bachata · 4 weeks', amount: '$70' },
-        { qty: '2 courses', detail: 'Salsa AND Bachata · 4 weeks', amount: '$110' },
+      price: [],
+      priceNote: '',
+    },
+    {
+      id: 'thursday',
+      level: 'Thursday',
+      title: 'Arataki Community Center',
+      desc: 'Urban Dance — Reggaeton & Hip-Hop. All levels welcome, ages 16+.',
+      schedule: [
+        { time: '7:15pm', style: 'Urban Dance', level: 'All levels', tag: '+16' },
       ],
-      priceNote: 'You save $30 when you do both courses.',
+      location: 'Arataki Community Center',
+      popular: false,
+      price: [],
+      priceNote: '',
     },
     {
       id: 'firstdance',
@@ -72,7 +83,7 @@ export default function Classes() {
 
       <div className="max-w-7xl mx-auto px-6 relative">
         <div className="text-center mb-16 reveal">
-          <p className="font-script text-mostaza text-2xl mb-3">Our classes</p>
+          <p className="font-script text-mostaza text-2xl mb-3">{currentMonth} schedule</p>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-white mb-6">
             Find your <span className="gradient-text">rhythm</span>
           </h2>
@@ -82,7 +93,7 @@ export default function Classes() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 stagger">
           {classes.map((c) => (
             <div
               key={c.id}
@@ -96,9 +107,6 @@ export default function Classes() {
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-turquesa to-mostaza text-dark text-xs font-bold uppercase tracking-wider px-4 py-1 rounded-full">
                   Most popular
                 </div>
-              )}
-              {c.month && (
-                <p className="font-display text-lg font-bold text-white/90 mb-1">{c.month}</p>
               )}
               <span className="text-mostaza text-xs font-semibold uppercase tracking-wider">{c.level}</span>
               <h3 className="font-display text-2xl font-bold text-white mt-2 mb-3">{c.title}</h3>
